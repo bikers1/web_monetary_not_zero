@@ -1,7 +1,15 @@
 /** @odoo-module */
 
+
+// Author   => Albertus Restiyanto Pramayudha
+// email    => xabre0010@gmail.com
+// linkedin => https://www.linkedin.com/in/albertus-restiyanto-pramayudha-470261a8/
+// youtube  => https://www.youtube.com/channel/UCCtgLDIfqehJ1R8cohMeTXA
+
 import { patch, unpatch } from "@web/core/utils/patch";
 import { Record } from "@web/views/basic_relational_model";
+import { evalDomain } from "@web/views/utils";
+import { FormController } from "@web/views/form/form_controller";
 
 
 patch(Record.prototype, 'yudha_web_monetary_not_zero', {
@@ -63,41 +71,23 @@ patch(Record.prototype, 'yudha_web_monetary_not_zero', {
 patch(FormController.prototype, 'pest_one2many_formcontroller', {
     async saveButtonClicked(params = {}) {
         const record = this.model.root;
-        if ((record.resModel ==='power.check.in' ) || (record.resModel  ==='power.check.out')){
-            if (await record.checkValidity()) {
-                this.disableButtons();
-                const record = this.model.root;
-                let saved = false;
-                if (this.props.saveRecord) {
-                    saved = await this.props.saveRecord(record, params);
-                } else {
-                    saved = await record.save();
-                }
-                this.enableButtons();
-                if (saved && this.props.onSave) {
-                    this.props.onSave(record, params);
-                }
-                return saved;
+        if (await record.checkValidity()) {
+            this.disableButtons();
+            const record = this.model.root;
+            let saved = false;
+            if (this.props.saveRecord) {
+                saved = await this.props.saveRecord(record, params);
             } else {
-                record.openInvalidFieldsNotification();
-                return false;
+                saved = await record.save();
             }
+            this.enableButtons();
+            if (saved && this.props.onSave) {
+                this.props.onSave(record, params);
+            }
+            return saved;
         } else {
-                this.disableButtons();
-                const record = this.model.root;
-                let saved = false;
-
-                if (this.props.saveRecord) {
-                    saved = await this.props.saveRecord(record, params);
-                } else {
-                    saved = await record.save();
-                }
-                this.enableButtons();
-                if (saved && this.props.onSave) {
-                    this.props.onSave(record, params);
-                }
-
-                return saved;
+            record.openInvalidFieldsNotification();
+            return false;
         }
     },
 });
